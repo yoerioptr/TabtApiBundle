@@ -1,0 +1,59 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Yoerioptr\TabtApiBundle;
+
+use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
+use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Yoerioptr\TabtApiClient\Client\Client;
+use Yoerioptr\TabtApiClient\Client\ClientInterface;
+use Yoerioptr\TabtApiClient\Entries\CredentialsType;
+use Yoerioptr\TabtApiClient\Tabt;
+use Yoerioptr\TabtApiClient\TabtInterface;
+
+use function Symfony\Component\DependencyInjection\Loader\Configurator\service;
+
+final class TabtApiBundle extends AbstractBundle
+{
+    #[\Override]
+    public function configure(
+        DefinitionConfigurator $definition,
+    ): void {
+        $definition->rootNode()
+            ->children()
+                ->scalarNode('username')
+                    ->defaultNull()
+                ->end()
+                ->scalarNode('password')
+                    ->defaultNull()
+                ->end()
+            ->end();
+    }
+
+    #[\Override]
+    public function loadExtension(array $config, ContainerConfigurator $configurator, ContainerBuilder $container): void
+    {
+        $services = $configurator->services();
+
+        $services
+            ->set(CredentialsType::class)
+            ->args([
+                $config['username'],
+                $config['password'],
+            ]);
+
+        $services
+            ->alias(ClientInterface::class, Client::class);
+
+        $services
+            ->set(Tabt::class)
+            ->call('setCredentials', [service(CredentialsType::class)])
+            ->public();
+
+        $services
+        ->alias(TabtInterface::class, Tabt::class);
+    }
+}
