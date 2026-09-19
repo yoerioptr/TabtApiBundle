@@ -5,7 +5,7 @@
   "license": "MIT",
   "require": {
     "php": "^8.1",
-    "yoerioptr/tabt-api-client": "^1.0",
+    "yoerioptr/tabt-api-client": "^2.1",
     "symfony/config": "^6.4 || ^7.0 || ^8.0",
     "symfony/http-kernel": "^6.4 || ^7.0 || ^8.0",
     "symfony/dependency-injection": "^8.1"

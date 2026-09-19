@@ -46,14 +46,21 @@ final class TabtApiBundle extends AbstractBundle
             ]);
 
         $services
+            ->set(Client::class)
+            ->call('setCredentials', [
+                service(CredentialsType::class),
+            ]);
+
+        $services
             ->alias(ClientInterface::class, Client::class);
 
         $services
             ->set(Tabt::class)
-            ->call('setCredentials', [service(CredentialsType::class)])
-            ->public();
+            ->args([
+                service(ClientInterface::class),
+            ]);
 
         $services
-        ->alias(TabtInterface::class, Tabt::class);
+            ->alias(TabtInterface::class, Tabt::class);
     }
 }
