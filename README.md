@@ -1,5 +1,7 @@
 # TabtApiBundle
 
+[![No AI](https://custom-icon-badges.demolab.com/badge/No%20AI-2f2f2f?logo=non-ai&logoColor=white&logoSize=auto)](#)
+
 The TabT API Bundle is a Symfony integration for the [TabT API Client](https://github.com/yoerioptr/TabtApiClient), a helper library for Frenoy's TabT API.
 
 ## Setup
