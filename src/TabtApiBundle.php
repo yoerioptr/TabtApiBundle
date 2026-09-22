@@ -8,6 +8,9 @@ use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
+use Yoerioptr\TabtApiBundle\Doctrine\ApiFetcher;
+use Yoerioptr\TabtApiBundle\Doctrine\EntityHydrator;
+use Yoerioptr\TabtApiBundle\Doctrine\MappingRegistry;
 use Yoerioptr\TabtApiClient\Client\Client;
 use Yoerioptr\TabtApiClient\Client\ClientInterface;
 use Yoerioptr\TabtApiClient\Entries\CredentialsType;
@@ -40,6 +43,26 @@ final class TabtApiBundle extends AbstractBundle
                                         ->scalarNode('entity')
                                             ->isRequired()
                                         ->end()
+                                        ->scalarNode('identifier')
+                                            ->defaultValue('id')
+                                        ->end()
+                                        ->arrayNode('source')
+                                            ->children()
+                                                ->scalarNode('repository')
+                                                    ->isRequired()
+                                                ->end()
+                                                ->scalarNode('method')
+                                                    ->isRequired()
+                                                ->end()
+                                                ->scalarNode('entries')
+                                                    ->isRequired()
+                                                ->end()
+                                                ->arrayNode('parameters')
+                                                    ->useAttributeAsKey('name')
+                                                ->scalarPrototype()->end()
+                                            ->end()
+                                        ->end()
+                                    ->end()
                                         ->arrayNode('fields')
                                             ->useAttributeAsKey('name')
                                         ->scalarPrototype()->end()
@@ -81,5 +104,20 @@ final class TabtApiBundle extends AbstractBundle
 
         $services
             ->alias(TabtInterface::class, Tabt::class);
+
+        $services
+            ->set(MappingRegistry::class)
+            ->args([
+                $config['doctrine']['mappings'],
+            ]);
+
+        $services
+            ->set(EntityHydrator::class);
+
+        $services
+            ->set(ApiFetcher::class)
+            ->args([
+                service(TabtInterface::class),
+            ]);
     }
 }
