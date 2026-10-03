@@ -6,6 +6,7 @@
     "require": {
         "php": ">=8.4",
         "doctrine/collections": "^3.0",
+        "doctrine/dbal": "^4.0",
         "doctrine/persistence": "^3.0 || ^4.0",
         "yoerioptr/tabt-api-client": "^2.1",
         "symfony/config": "^6.4 || ^7.0 || ^8.0",

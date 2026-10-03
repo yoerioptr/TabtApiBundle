@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yoerioptr\TabtApiBundle;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use Symfony\Component\Config\Definition\Configurator\DefinitionConfigurator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
@@ -11,6 +13,7 @@ use Symfony\Component\HttpKernel\Bundle\AbstractBundle;
 use Yoerioptr\TabtApiBundle\Doctrine\ApiFetcher;
 use Yoerioptr\TabtApiBundle\Doctrine\EntityHydrator;
 use Yoerioptr\TabtApiBundle\Doctrine\MappingRegistry;
+use Yoerioptr\TabtApiBundle\ReadModel\ReadModel;
 use Yoerioptr\TabtApiClient\Client\Client;
 use Yoerioptr\TabtApiClient\Client\ClientInterface;
 use Yoerioptr\TabtApiClient\Entries\CredentialsType;
@@ -32,6 +35,14 @@ final class TabtApiBundle extends AbstractBundle
                 ->end()
                 ->scalarNode('password')
                     ->defaultNull()
+                ->end()
+                ->arrayNode('read_model')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->booleanNode('enabled')
+                            ->defaultFalse()
+                        ->end()
+                    ->end()
                 ->end()
                 ->arrayNode('doctrine')
                     ->addDefaultsIfNotSet()
@@ -119,5 +130,23 @@ final class TabtApiBundle extends AbstractBundle
             ->args([
                 service(TabtInterface::class),
             ]);
+
+        if ($config['read_model']['enabled']) {
+            $services
+                ->set('tabt_api.read_model.connection', Connection::class)
+                ->factory([DriverManager::class, 'getConnection'])
+                ->args([
+                    ['driver' => 'pdo_sqlite', 'memory' => true],
+                ]);
+
+            $services
+                ->set(ReadModel::class)
+                ->args([
+                    service('tabt_api.read_model.connection'),
+                    service(MappingRegistry::class),
+                    service(EntityHydrator::class),
+                    service(ApiFetcher::class),
+                ]);
+        }
     }
 }

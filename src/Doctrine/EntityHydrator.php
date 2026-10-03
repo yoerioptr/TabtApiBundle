@@ -25,7 +25,7 @@ final class EntityHydrator
         return $entity;
     }
 
-    private function readValue(object $entry, string $field): mixed
+    public function readValue(object $entry, string $field): mixed
     {
         $getter = 'get'.ucfirst($field);
 
@@ -57,7 +57,7 @@ final class EntityHydrator
         return $reflection->getValue($entry);
     }
 
-    private function writeValue(object $entity, string $property, mixed $value): void
+    public function writeValue(object $entity, string $property, mixed $value): void
     {
         $setter = 'set'.ucfirst($property);
 

@@ -56,12 +56,4 @@ final class MappingRegistry
         return $this->mappings[$entityClass]
             ?? throw MappingNotFoundException::forEntity($entityClass);
     }
-
-    /**
-     * @return array<class-string, Mapping>
-     */
-    public function all(): array
-    {
-        return $this->mappings;
-    }
 }
